@@ -147,12 +147,51 @@ FastAPIインスタンスに対する、デコレータで修飾された関数�
 `/hello`のエンドポイントのことを**パス**という。  
  `get`の部分を**オペレーション**という。RESTにおけるHTTPメソッドを定義する。
 
+### アプリケーションの概要
+TODOアプリを作成する。  
 
+#### REST API
+REST APIでは、HTTPでやり取りする際に、URLですべての「リソース」を定義する。リソースを表す**エンドポイント**と、**HTTPメソッド**(GET/POST/PUT/DELETE)を組み合わせてAPI全体を構成する。  
 
+- TODOリストを表示する
+- TODOにタスクを追加する
+- TODOのタスクの説明文を変更する
+- TODOのタスク自体を削除する
+- TODOタスクに「完了」フラグを立てる
+- TODOタスクから「完了」フラグを外す
 
+という機能を実装するために、REST APIでは、  
+`HTTPメソッド` `エンドポイント`  
+  
+- GET /tasks
+- POST /tasks
+- PUT /tasks/{task_id}
+- DELETE /tasks/{task_id}
+- PUT /tasks/{task_id}/done
+- DELETE /tasks/{task_id}/done
 
+#### ディレクトリ構成
+FastAPIではディレクトリ構成、ファイル分割を厳密に決めてはいない。このチュートリアルでは比較的細かくディレクトリを分割する。  
 
+```sh
+❯ tree
+.
+├── __init__.py
+├── __pycache__
+│   ├── __init__.cpython-39.pyc
+│   └── main.cpython-39.pyc
+├── cruds
+│   └── __init__.py
+├── main.py
+├── models
+│   └── __init__.py
+├── routers
+│   └── __init__.py
+└── schemas
+    └── __init__.py
 
+5 directories, 8 files
+```
 
 
 
