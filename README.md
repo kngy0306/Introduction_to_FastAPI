@@ -53,3 +53,106 @@ imageの作成
 ```sh
 docker-compose build
 ```
+
+### FastAPIのインストール
+#### poetryによるPython環境のセットアップ
+poetry ... パッケージ同士の依存関係を解決してくれるツール。  
+
+最初は`poetry`に置いて依存関係を管理する`pyproject.toml`が存在しないため、`poetry`でFastAPIをインストールし、`pyproject.toml`を作成する。  
+
+Authorのみ`n`を入力。それ以外Enter  
+```sh
+docker-compose run \
+  --entrypoint "poetry init \
+    --name demo-app \
+    --dependency fastapi \
+    --dependency uvicorn[standard]" \
+  demo-app
+```
+Dockerコンテナ（`demo-app`）の中で、 `poetry init` コマンドを実行。引数として、 `fastapi` と、ASGIサーバーである `uvicorn` をインストールする依存パッケージとして指定。  
+
+#### FastAPIのインストール
+上記工程でFastAPIを依存パッケージに含んでいる、poetryの定義ファイルを作成した。
+```sh
+docker-compose run --entrypoint "poetry install" demo-app
+```  
+
+上記工程により、Dockerイメージを1から作った際は、FastAPIを含んだPython環境をイメージ内に含めることができる。  
+新たなパッケージの追加時には、イメージの再ビルドだけでpyproject.tomlを含む全てのパッケージをインストール可。  
+```sh
+docker-compose build --no-cache
+```  
+
+### Hello, World!
+#### `api`ディレクトリ、ファイルの作成。
+api/__init__.py
+```
+
+```  
+api/main.py
+```py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/hello")
+async def hello():
+    return {"message": "hello world!"}
+```   
+`__init__.py`は、`api`ディレクトリがPythonモジュールであることを示す**空ファイル**。`main.py`にはコードを記載。
+
+#### ファイル構成図
+```sh
+❯ tree
+.
+├── Dockerfile
+├── README.md
+├── app
+│   ├── __init__.py
+│   └── main.py
+├── docker-compose.yml
+├── poetry.lock
+└── pyproject.toml
+
+1 directory, 7 files
+```  
+
+#### API立ち上げ
+```sh
+docker-compose up
+```  
+
+アクセスする。  
+http://localhost:8000/docs  
+
+![スクリーンショット 2021-07-18 10 03 34](https://user-images.githubusercontent.com/57553474/126052547-43bca99b-8920-4cf6-af1d-d59954976df6.png)  
+↑ **Swagger UI**  
+Swagger UIは、OpneAPIという形式で定義される、RESTful APIを定義するフォーマットで記述された、APIドキュメント。  
+実際にAPI動作を検証することができる。（対話的ドキュメント）  
+
+#### コードの中身
+```py
+app = FastAPI()
+```
+↑ `app`はFastAPIのインスタンス。`main.py`内に`if __name__ == "__main__":`が無いが、実際にはunicornを通して`app`インスタンスが参照される。  
+```py
+@app.get("/hello")
+```  
+`@`で始まる↑を**デコレータ**という。関数を修飾し、新たな機能を追加する。  
+FastAPIインスタンスに対する、デコレータで修飾された関数を、FastAPIでは**パスオペレーション関数**という。  
+パスオペレーション関数の構成は以下2つ。  
+- パス
+- オペレーション
+`/hello`のエンドポイントのことを**パス**という。  
+ `get`の部分を**オペレーション**という。RESTにおけるHTTPメソッドを定義する。
+
+
+
+
+
+
+
+
+
+
